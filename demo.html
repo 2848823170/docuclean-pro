@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuClean Pro / 文档表格秒转引擎 v1.0.0 — 零云端本地工作台</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-2: #0b1220;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --brand: #38bdf8;
+      --brand-dark: #0284c7;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --navy: #1e3a5f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, #0b1220 0%, #162544 100%);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-title { font-size: 19px; font-weight: 700; letter-spacing: 0.3px; }
+    .brand-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.14);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px 24px 40px;
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 1024px) { main { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dropzone {
+      border: 2px dashed #475569;
+      border-radius: 10px;
+      padding: 18px 14px;
+      text-align: center;
+      background: var(--panel-2);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .dropzone.dragover, .dropzone:hover {
+      border-color: var(--brand);
+      background: rgba(56, 189, 248, 0.07);
+    }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #263449;
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    button:hover { border-color: var(--brand); background: #2d3f59; }
+    button.primary {
+      background: var(--brand-dark);
+      border-color: var(--brand);
+      color: #fff;
+    }
+    button.primary:hover { background: #0369a1; }
+    textarea {
+      width: 100%;
+      height: 185px;
+      margin-top: 12px;
+      background: var(--panel-2);
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      resize: vertical;
+    }
+    .options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 12.5px;
+      color: #cbd5e1;
+    }
+    .options-row label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-box {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .stat-val { font-size: 18px; font-weight: 700; color: var(--brand); }
+    .stat-lbl { font-size: 11.5px; color: var(--muted); }
+    .export-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+    }
+    .tab-btn {
+      padding: 5px 11px;
+      font-size: 12px;
+      border-radius: 6px;
+      background: var(--panel-2);
+    }
+    .tab-btn.active {
+      background: var(--navy);
+      border-color: var(--brand);
+      color: #fff;
+    }
+    .table-wrap {
+      overflow: auto;
+      max-height: 490px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: #0f172a;
+    }
+    table.preview {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    table.preview th {
+      position: sticky;
+      top: 0;
+      background: #1e3a5f;
+      color: #fff;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      white-space: nowrap;
+    }
+    table.preview td {
+      padding: 6px 10px;
+      border: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    table.preview tr:nth-child(even) td { background: #f8fafc; }
+    table.preview tr.formula-row td {
+      background: #e2e8f0;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      background: rgba(56, 189, 248, 0.16);
+      color: #7dd3fc;
+      margin-left: 6px;
+    }
+    .para-preview {
+      margin-top: 12px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12.5px;
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="brand-title">DocuClean Pro / 文档表格秒转引擎 v1.0.0</div>
+      <div class="brand-sub">乱码自动修复 · 跨行跨列网页表展开 · JSON/XML平铺 · 原生 Excel 动态公式 (.xlsx) 与标准排版 Word (.docx) 秒级生成</div>
+    </div>
+    <div class="pill">100% 本地离线运算 · 零服务器上传 · 隐私安全</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>
+        <span>1. 导入文件或粘贴原始乱码/杂乱内容</span>
+        <span id="encodingBadge" class="badge">就绪</span>
+      </h2>
+
+      <div id="dropzone" class="dropzone">
+        <div style="font-weight:700;margin-bottom:4px;">点击选择文件 或 拖拽多个文件到此处</div>
+        <div style="font-size:12px;color:var(--muted);">支持 .csv / .tsv (GBK·UTF-8·乱码) / .html / .json / .jsonl / .xml / .md / .txt</div>
+        <input id="fileInput" type="file" multiple accept=".csv,.tsv,.html,.htm,.json,.jsonl,.xml,.md,.txt" style="display:none" />
+      </div>
+
+      <div style="margin-top:12px;font-size:12px;color:var(--muted);">一键加载真实痛点样例（点击立即运行真实解析算法）：</div>
+      <div class="preset-grid">
+        <button type="button" data-preset="mojibake">样例1：CSV 乱码修复 + 去重</button>
+        <button type="button" data-preset="html">样例2：HTML 跨行跨列合并表</button>
+        <button type="button" data-preset="json">样例3：嵌套电商 JSON 展开</button>
+        <button type="button" data-preset="md">样例4：断行文本转排版 Word</button>
+      </div>
+
+      <textarea id="rawInput" spellcheck="false" placeholder="在此直接粘贴乱码 CSV、网页 HTML <table> 源码、JSON/XML 数据或断行错乱的文档段落..."></textarea>
+
+      <div class="options-row">
+        <label><input type="checkbox" id="optMerge" checked /> 多表合并汇总 (Merge)</label>
+        <label><input type="checkbox" id="optDedupe" checked /> 自动剔除重复行 (Dedupe)</label>
+        <label><input type="checkbox" id="optFormulas" checked /> 自动写入 SUM/AVG 公式</label>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button type="button" id="runBtn" class="primary" style="flex:1;">立即清洗并生成预览</button>
+        <button type="button" id="clearBtn">清空</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>
+        <span>2. 实时清洗核验与一键导出 (.xlsx / .docx / .md / .csv)</span>
+        <span id="elapsedBadge" class="badge">0 ms</span>
+      </h2>
+
+      <div class="stats-bar">
+        <div class="stat-box">
+          <div id="statTables" class="stat-val">0</div>
+          <div class="stat-lbl">识别工作表 (Sheets)</div>
+        </div>
+        <div class="stat-box">
+          <div id="statRows" class="stat-val">0</div>
+          <div class="stat-lbl">有效数据行 (Rows)</div>
+        </div>
+        <div class="stat-box">
+          <div id="statDedupe" class="stat-val">0</div>
+          <div class="stat-lbl">去重剔除行 (Deduped)</div>
+        </div>
+        <div class="stat-box">
+          <div id="statEncoding" class="stat-val" style="font-size:14px;">UTF-8</div>
+          <div class="stat-lbl">编码与乱码诊断</div>
+        </div>
+      </div>
+
+      <div class="export-bar">
+        <button type="button" id="dlXlsxBtn" class="primary">下载标准排版 Excel (.xlsx 含公式)</button>
+        <button type="button" id="dlDocxBtn" class="primary">下载可编辑 Word (.docx 微软雅黑)</button>
+        <button type="button" id="dlCsvBtn">下载无乱码 UTF-8 (.csv)</button>
+        <button type="button" id="dlMdBtn">下载整洁 Markdown (.md)</button>
+      </div>
+
+      <div id="sheetTabs" class="tabs"></div>
+      <div class="table-wrap">
+        <table id="previewTable" class="preview"></table>
+      </div>
+      <div id="paraBox" class="para-preview" style="display:none;"></div>
+    </section>
+  </main>
+
+  <script>
+/**
+ * DocuClean Pro Web & Node Core Engine v1.0.0 (Zero External Dependencies)
+ * - Smart byte decoding (UTF-8, UTF-16LE/BE, GB18030) + UTF-8-as-Latin1 mojibake repair
+ * - Multi-format parsers: CSV/TSV, HTML (rowspan/colspan 2D expansion), JSON/JSONL, XML, Markdown/Text, basic PDF text streams
+ * - Real OpenXML .xlsx binary generator (auto-column width, freeze panes, AutoFilter, number formats, live SUM/AVERAGE formulas)
+ * - Real OpenXML .docx binary generator (headings, reflowed paragraphs, Microsoft YaHei w:eastAsia, repeating table headers)
+ */
+
+const ZERO_WIDTH_RE = /[\u200b\u200c\u200d\ufeff\u2060]/g
+const XML_ILLEGAL_CTRL_RE = /[\x00-\x08\x0e-\x1f\x7f\ufffe\uffff]/g
+const VT_FF_RE = /[\x0b\x0c]/g
+const LONE_SURROGATE_RE = /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g
+const CURRENCY_RE =
+  /^\s*(\()?\s*([¥￥$€£]|RMB|CNY|USD)?\s*([+-])?\s*(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*(\))?\s*$/i
+const PERCENT_RE = /^\s*([+-]?\d+(?:,\d{3})*(?:\.\d+)?)\s*%\s*$/
+const CN_DATE_RE = /^\s*(\d{4})\s*[年/.-]\s*(\d{1,2})\s*[月/.-]\s*(\d{1,2})\s*日?\s*$/
+const ID_HEADER_RE = /(?:^id$|编号|序号|年份|year|code|邮编|电话)/i
+
+function sanitizeTextInput(val) {
+  if (val === null || val === undefined) return ""
+  return String(val)
+    .replace(ZERO_WIDTH_RE, "")
+    .replace(XML_ILLEGAL_CTRL_RE, "")
+    .replace(VT_FF_RE, " ")
+    .replace(LONE_SURROGATE_RE, "")
+    .replace(/\r\n?/g, "\n")
+}
+
+function cleanCellStr(val) {
+  if (val === null || val === undefined) return ""
+  return sanitizeTextInput(val)
+    .replace(/\u00a0/g, " ")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n")
+    .trim()
+}
+
+function textQualityScore(text) {
+  if (!text) return -1e9
+  let cjk = 0
+  let ascii = 0
+  let latinExt = 0
+  let repl = 0
+  let bad = 0
+  for (let i = 0; i < text.length; i++) {
+    const cp = text.charCodeAt(i)
+    if (cp === 0xfffd) repl++
+    else if (cp === 9 || cp === 10 || cp === 13 || (cp >= 0x20 && cp <= 0x7e)) ascii++
+    else if (
+      (cp >= 0x4e00 && cp <= 0x9fff) ||
+      (cp >= 0x3000 && cp <= 0x303f) ||
+      (cp >= 0xff00 && cp <= 0xffef)
+    )
+      cjk++
+    else if (cp >= 0x80 && cp <= 0xff) latinExt++
+    else if (cp < 0x20) bad++
+  }
+  return (
+    (cjk * 3.0 + ascii * 1.0 - latinExt * 1.8 - repl * 25.0 - bad * 20.0) /
+    Math.max(text.length, 1)
+  )
+}
+
+function tryRepairMojibake(text) {
+  if (!text) return { text, repaired: false }
+  let highLatin = 0
+  for (let i = 0; i < text.length; i++) {
+    const cp = text.charCodeAt(i)
+    if (cp >= 0x80 && cp <= 0x024f) highLatin++
+  }
+  if (highLatin < 2) return { text, repaired: false }
+
+  const baseScore = textQualityScore(text)
+  // Check if all codepoints fit in 0..255 (Latin-1 byte preservation)
+  let fitsLatin1 = true
+  const bytes = new Uint8Array(text.length)
+  for (let i = 0; i < text.length; i++) {
+    const cp = text.charCodeAt(i)
+    if (cp > 0xff) {
+      fitsLatin1 = false
+      break
+    }
+    bytes[i] = cp
+  }
+  if (fitsLatin1) {
+    try {
+      const candidate = new TextDecoder("utf-8", { fatal: true }).decode(bytes)
+      if (textQualityScore(candidate) > baseScore + 0.35) {
+        return { text: candidate, repaired: true }
+      }
+    } catch {}
+  }
+  return { text, repaired: false }
+}
+
+function decodeBytesSmart(uint8) {
+  const bytes = uint8 instanceof Uint8Array ? uint8 : new Uint8Array(uint8)
+  if (bytes.length >= 3 && bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) {
+    const raw = new TextDecoder("utf-8").decode(bytes.subarray(3))
+    const m = tryRepairMojibake(raw)
+    return {
+      text: sanitizeTextInput(m.text),
+      encoding: "utf-8-sig",
+      mojibakeRepaired: m.repaired,
+    }
+  }
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
+    return {
+      text: sanitizeTextInput(new TextDecoder("utf-16le").decode(bytes.subarray(2))),
+      encoding: "utf-16-le",
+      mojibakeRepaired: false,
+    }
+  }
+  if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+    return {
+      text: sanitizeTextInput(new TextDecoder("utf-16be").decode(bytes.subarray(2))),
+      encoding: "utf-16-be",
+      mojibakeRepaired: false,
+    }
+  }
+
+  try {
+    const utf8 = new TextDecoder("utf-8", { fatal: true }).decode(bytes)
+    const m = tryRepairMojibake(utf8)
+    return {
+      text: sanitizeTextInput(m.text),
+      encoding: m.repaired ? "utf-8 (mojibake->utf-8)" : "utf-8",
+      mojibakeRepaired: m.repaired,
+    }
+  } catch {}
+
+  for (const enc of ["gb18030", "big5", "windows-1252"]) {
+    try {
+      const dec = new TextDecoder(enc, { fatal: true }).decode(bytes)
+      if (textQualityScore(dec) > 0.2) {
+        return {
+          text: sanitizeTextInput(dec),
+          encoding: enc,
+          mojibakeRepaired: false,
+        }
+      }
+    } catch {}
+  }
+
+  return {
+    text: sanitizeTextInput(new TextDecoder("utf-8").decode(bytes)),
+    encoding: "utf-8-fallback",
+    mojibakeRepaired: false,
+  }
+}
+
+function parseTypedCell(raw) {
+  if (raw === null || raw === undefined) return { value: "", kind: "text", styleIdx: 1 }
+  if (typeof raw === "number" && Number.isFinite(raw)) {
+    return {
+      value: raw,
+      kind: Number.isInteger(raw) ? "integer" : "decimal",
+      styleIdx: Number.isInteger(raw) ? 2 : 3,
+    }
+  }
+  const s = cleanCellStr(raw)
+  if (!s || s === "-" || s === "—" || s === "null" || s === "None") {
+    return { value: s === "null" || s === "None" ? "" : s, kind: "text", styleIdx: 1 }
+  }
+  if (/^0\d+$/.test(s) || /^\d{11,}$/.test(s)) {
+    return { value: s, kind: "text", styleIdx: 1 }
+  }
+  const mPct = PERCENT_RE.exec(s)
+  if (mPct) {
+    const num = Number(mPct[1].replace(/,/g, ""))
+    if (Number.isFinite(num)) {
+      return { value: num / 100, kind: "percent", styleIdx: 5 }
+    }
+  }
+  const mCur = CURRENCY_RE.exec(s)
+  if (mCur) {
+    const hasOpen = Boolean(mCur[1])
+    const hasClose = Boolean(mCur[5])
+    if (hasOpen === hasClose) {
+      const sign = mCur[3] === "-" || (hasOpen && hasClose) ? -1 : 1
+      const numStr = mCur[4].replace(/,/g, "")
+      const num = Number(numStr) * sign
+      if (Number.isFinite(num)) {
+        const sym = (mCur[2] || "").toUpperCase()
+        if (sym) {
+          return { value: num, kind: "currency", styleIdx: 4 }
+        }
+        const isInt = !numStr.includes(".")
+        return { value: num, kind: isInt ? "integer" : "decimal", styleIdx: isInt ? 2 : 3 }
+      }
+    }
+  }
+  const mDate = CN_DATE_RE.exec(s)
+  if (mDate) {
+    const yr = Number(mDate[1])
+    const mo = String(Number(mDate[2])).padStart(2, "0")
+    const dy = String(Number(mDate[3])).padStart(2, "0")
+    return { value: `${yr}-${mo}-${dy}`, kind: "date", styleIdx: 1 }
+  }
+  return { value: s, kind: "text", styleIdx: 1 }
+}
+
+function normalizeHeaders(rawHeaders, ncols) {
+  const seen = new Map()
+  const out = []
+  for (let i = 0; i < ncols; i++) {
+    const base = cleanCellStr(rawHeaders[i] ?? "") || `Column_${i + 1}`
+    const cnt = (seen.get(base) || 0) + 1
+    seen.set(base, cnt)
+    out.push(cnt === 1 ? base : `${base}_${cnt}`)
+  }
+  return out
+}
+
+function gridToTable(grid, name = "Sheet1", sourceFile = "") {
+  const cleaned = grid
+    .map((r) => r.map((c) => cleanCellStr(c)))
+    .filter((r) => r.some((c) => c !== ""))
+  if (cleaned.length === 0) return null
+  const ncols = Math.max(...cleaned.map((r) => r.length))
+  const padded = cleaned.map((r) => [...r, ...Array(ncols - r.length).fill("")])
+  const keepCols = []
+  for (let c = 0; c < ncols; c++) {
+    if (padded.some((r) => r[c] !== "")) keepCols.push(c)
+  }
+  if (keepCols.length === 0) return null
+  const compact = padded.map((r) => keepCols.map((c) => r[c]))
+  return {
+    name: name.slice(0, 28) || "Sheet1",
+    headers: normalizeHeaders(compact[0], keepCols.length),
+    rows: compact.slice(1),
+    sourceFile,
+  }
+}
+
+function parseCsvText(text, name = "Table_1", sourceFile = "") {
+  const nonEmptyLines = text.split("\n").filter((l) => l.trim() !== "")
+  if (nonEmptyLines.length === 0) return []
+  const delims = [",", "\t", ";", "|"]
+  let bestDelim = ","
+  let bestCount = -1
+  for (const d of delims) {
+    const count = nonEmptyLines
+      .slice(0, 15)
+      .reduce((acc, ln) => acc + (ln.split(d).length - 1), 0)
+    if (count > bestCount) {
+      bestCount = count
+      bestDelim = d
+    }
+  }
+  const rows = []
+  let row = []
+  let field = ""
+  let inQuotes = false
+  const src = (
+    bestDelim === ","
+      ? text.replace(/(?<!")((?:\()?[¥￥$€£]\s*[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:\))?)(?!")/g, '"$1"')
+      : text
+  )
+  const srcWithNl = src.endsWith("\n") ? src : `${src}\n`
+  for (let i = 0; i < srcWithNl.length; i++) {
+    const ch = srcWithNl[i]
+    if (inQuotes) {
+      if (ch === '"') {
+        if (srcWithNl[i + 1] === '"') {
+          field += '"'
+          i++
+        } else {
+          inQuotes = false
+        }
+      } else {
+        field += ch
+      }
+    } else if (ch === '"') {
+      inQuotes = true
+    } else if (ch === bestDelim) {
+      row.push(field)
+      field = ""
+    } else if (ch === "\n") {
+      row.push(field)
+      field = ""
+      if (row.some((c) => cleanCellStr(c) !== "")) rows.push(row)
+      row = []
+    } else if (ch !== "\r") {
+      field += ch
+    }
+  }
+  const tbl = gridToTable(rows, name, sourceFile)
+  return tbl ? [tbl] : []
+}
+
+function stripTags(html) {
+  return cleanCellStr(
+    html
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">")
+      .replace(/&quot;/gi, '"')
+      .replace(/&yen;/gi, "¥"),
+  )
+}
+
+function parseHtmlTables(html, sourceFile = "") {
+  const tables = []
+  const tableRegex = /<table\b[^>]*>([\s\S]*?)<\/table>/gi
+  let tMatch
+  let tIdx = 0
+  while ((tMatch = tableRegex.exec(html)) !== null) {
+    tIdx++
+    const tableInner = tMatch[1]
+    const capMatch = /<caption\b[^>]*>([\s\S]*?)<\/caption>/i.exec(tableInner)
+    const tableName = capMatch ? stripTags(capMatch[1]) : `Table_${tIdx}`
+    const grid = new Map()
+    let maxRow = 0
+    let maxCol = 0
+
+    const trRegex = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi
+    let trMatch
+    let rIdx = 0
+    while ((trMatch = trRegex.exec(tableInner)) !== null) {
+      const trInner = trMatch[1]
+      const cellRegex = /<(th|td)\b([^>]*)>([\s\S]*?)<\/\1>/gi
+      let cMatch
+      let cIdx = 0
+      while ((cMatch = cellRegex.exec(trInner)) !== null) {
+        while (grid.has(`${rIdx},${cIdx}`)) cIdx++
+        const tag = cMatch[1].toLowerCase()
+        const attrs = cMatch[2]
+        const text = stripTags(cMatch[3])
+        const rsM = /rowspan\s*=\s*["']?(\d+)/i.exec(attrs)
+        const csM = /colspan\s*=\s*["']?(\d+)/i.exec(attrs)
+        const rowspan = Math.max(1, rsM ? Number(rsM[1]) : 1)
+        const colspan = Math.max(1, csM ? Number(csM[1]) : 1)
+
+        for (let dr = 0; dr < rowspan; dr++) {
+          for (let dc = 0; dc < colspan; dc++) {
+            const key = `${rIdx + dr},${cIdx + dc}`
+            if (dr === 0 && dc === 0) grid.set(key, text)
+            else if (rIdx === 0 && dr === 0) grid.set(key, text ? `${text}_${dc + 1}` : "")
+            else if (dc === 0 && tag === "td" && !CURRENCY_RE.test(text) && !PERCENT_RE.test(text))
+              grid.set(key, text)
+            else grid.set(key, "")
+          }
+        }
+        maxRow = Math.max(maxRow, rIdx + rowspan)
+        maxCol = Math.max(maxCol, cIdx + colspan)
+        cIdx += colspan
+      }
+      rIdx++
+    }
+    const matrix = Array.from({ length: maxRow }, (_, r) =>
+      Array.from({ length: maxCol }, (_, c) => grid.get(`${r},${c}`) ?? ""),
+    )
+    const tbl = gridToTable(matrix, tableName, sourceFile)
+    if (tbl) tables.push(tbl)
+  }
+  return tables
+}
+
+function flattenObject(obj, prefix = "", out = {}) {
+  if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+    for (const [k, v] of Object.entries(obj)) {
+      const key = prefix ? `${prefix}.${k}` : k
+      if (v && typeof v === "object" && !Array.isArray(v)) flattenObject(v, key, out)
+      else if (Array.isArray(v))
+        out[key] = v.every((x) => typeof x !== "object") ? v.join(", ") : JSON.stringify(v)
+      else out[key] = v ?? ""
+    }
+  } else {
+    out[prefix || "value"] = obj ?? ""
+  }
+  return out
+}
+
+function recordsToTable(records, name, sourceFile) {
+  if (!records.length) return null
+  const flat = records.map((r) => flattenObject(r))
+  const headers = []
+  for (const rec of flat) {
+    for (const k of Object.keys(rec)) {
+      if (!headers.includes(k)) headers.push(k)
+    }
+  }
+  const rows = flat.map((rec) => headers.map((h) => cleanCellStr(rec[h] ?? "")))
+  return { name: name.slice(0, 28) || "Data", headers, rows, sourceFile }
+}
+
+function parseJsonText(text, name = "Data", sourceFile = "") {
+  const trimmed = text.trim()
+  let data
+  try {
+    data = JSON.parse(trimmed)
+  } catch {
+    data = trimmed
+      .split("\n")
+      .filter((l) => l.trim())
+      .map((l) => JSON.parse(l))
+  }
+  if (Array.isArray(data)) {
+    const tbl = recordsToTable(data, name, sourceFile)
+    return tbl ? [tbl] : []
+  }
+  if (data && typeof data === "object") {
+    const tables = []
+    for (const [k, v] of Object.entries(data)) {
+      if (Array.isArray(v) && v.length > 0 && typeof v[0] === "object") {
+        const tbl = recordsToTable(v, k, sourceFile)
+        if (tbl) tables.push(tbl)
+      }
+    }
+    if (tables.length > 0) return tables
+    const single = recordsToTable([data], name, sourceFile)
+    return single ? [single] : []
+  }
+  return []
+}
+
+function parseXmlText(text, name = "XML_Data", sourceFile = "") {
+  // Simple tag record extractor for repeated record elements
+  const cleaned = text.replace(/<\?xml[^>]*\?>/gi, "").trim()
+  const rootInnerMatch = /^<([A-Za-z0-9_:-]+)[^>]*>([\s\S]*)<\/\1>\s*$/.exec(cleaned)
+  if (!rootInnerMatch) return []
+  const inner = rootInnerMatch[2]
+  const recRegex = /<([A-Za-z0-9_:-]+)((?:\s+[^>]*?)?)>([\s\S]*?)<\/\1>/g
+  const records = []
+  let m
+  let recTag = name
+  while ((m = recRegex.exec(inner)) !== null) {
+    recTag = m[1].includes(":") ? m[1].split(":")[1] : m[1]
+    const rec = {}
+    const attrRegex = /([A-Za-z0-9_:-]+)\s*=\s*["']([^"']*)["']/g
+    let am
+    while ((am = attrRegex.exec(m[2])) !== null) {
+      rec[`@${am[1]}`] = am[2]
+    }
+    const childRegex = /<([A-Za-z0-9_:-]+)>([\s\S]*?)<\/\1>/g
+    let cm
+    let hasChild = false
+    while ((cm = childRegex.exec(m[3])) !== null) {
+      hasChild = true
+      rec[cm[1]] = stripTags(cm[2])
+    }
+    if (!hasChild) rec[recTag] = stripTags(m[3])
+    records.push(rec)
+  }
+  const tbl = recordsToTable(records, recTag, sourceFile)
+  return tbl ? [tbl] : []
+}
+
+function parseMarkdownOrText(text, name = "Document", sourceFile = "") {
+  const lines = text.split("\n")
+  const tables = []
+  const paragraphs = []
+  let paraBuf = []
+  let tIdx = 0
+
+  const flushPara = () => {
+    if (!paraBuf.length) return
+    let cur = ""
+    for (const raw of paraBuf) {
+      const ln = cleanCellStr(raw)
+      if (!ln) continue
+      if (!cur) cur = ln
+      else if (/[。！？.!?:：；;）)”\]】]$/.test(cur)) {
+        paragraphs.push(cur)
+        cur = ln
+      } else {
+        const needSpace = cur.charCodeAt(cur.length - 1) < 128 && ln.charCodeAt(0) < 128
+        cur += needSpace ? ` ${ln}` : ln
+      }
+    }
+    if (cur) paragraphs.push(cur)
+    paraBuf = []
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const ln = lines[i].trim()
+    if (!ln) {
+      flushPara()
+      continue
+    }
+    if (ln.includes("|") && i + 1 < lines.length && /^\s*\|?[\s:-]+\|[\s|:-]*$/.test(lines[i + 1])) {
+      flushPara()
+      const grid = [ln.replace(/^\||\|$/g, "").split("|").map((c) => c.trim())]
+      i += 2
+      while (i < lines.length && lines[i].includes("|")) {
+        grid.push(lines[i].trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim()))
+        i++
+      }
+      i--
+      tIdx++
+      const tbl = gridToTable(grid, `${name}_${tIdx}`, sourceFile)
+      if (tbl) tables.push(tbl)
+      continue
+    }
+    paraBuf.push(ln)
+  }
+  flushPara()
+
+  if (tables.length === 0 && nonTrivialDelimited(text)) {
+    return { tables: parseCsvText(text, name, sourceFile), paragraphs: [] }
+  }
+  return { tables, paragraphs }
+}
+
+function nonTrivialDelimited(text) {
+  const ls = text.split("\n").filter((l) => l.trim())
+  if (ls.length < 2) return false
+  return [",", "\t", ";"].some(
+    (d) => ls[0].includes(d) && ls[1].split(d).length === ls[0].split(d).length,
+  )
+}
+
+function parseInputPayload({ filename = "input.csv", bytes, text }) {
+  let decoded = { text: sanitizeTextInput(text ?? ""), encoding: "utf-8", mojibakeRepaired: false }
+  if (bytes) {
+    decoded = decodeBytesSmart(bytes)
+  } else if (typeof text === "string") {
+    const m = tryRepairMojibake(text)
+    decoded = {
+      text: sanitizeTextInput(m.text),
+      encoding: m.repaired ? "utf-8 (mojibake->utf-8)" : "utf-8",
+      mojibakeRepaired: m.repaired,
+    }
+  }
+
+  const lower = filename.toLowerCase()
+  const stem = filename.replace(/\.[^.]+$/, "") || "Sheet1"
+  let tables = []
+  let paragraphs = []
+
+  if (lower.endsWith(".html") || lower.endsWith(".htm") || /<table\b/i.test(decoded.text)) {
+    tables = parseHtmlTables(decoded.text, filename)
+  } else if (lower.endsWith(".json") || lower.endsWith(".jsonl") || /^[\[{]/.test(decoded.text.trim())) {
+    tables = parseJsonText(decoded.text, stem, filename)
+  } else if (lower.endsWith(".xml") || /^<\?xml|^<[A-Za-z0-9_:-]+[^>]*>/.test(decoded.text.trim())) {
+    tables = parseXmlText(decoded.text, stem, filename)
+  } else if (lower.endsWith(".csv") || lower.endsWith(".tsv")) {
+    tables = parseCsvText(decoded.text, stem, filename)
+  } else {
+    const res = parseMarkdownOrText(decoded.text, stem, filename)
+    tables = res.tables
+    paragraphs = res.paragraphs
+  }
+
+  return {
+    title: stem,
+    filename,
+    encoding: decoded.encoding,
+    mojibakeRepaired: decoded.mojibakeRepaired,
+    tables,
+    paragraphs,
+  }
+}
+
+function mergeAndDedupeTables(tables, { merge = false, dedupe = false } = {}) {
+  const cloned = tables.map((t) => ({
+    ...t,
+    headers: [...t.headers],
+    rows: t.rows.map((r) => [...r]),
+  }))
+
+  let dedupedRemoved = 0
+  if (dedupe) {
+    for (const t of cloned) {
+      const seen = new Set()
+      const kept = []
+      for (const r of t.rows) {
+        const key = r.map((c) => cleanCellStr(c)).join("\u001f")
+        if (seen.has(key)) {
+          dedupedRemoved++
+          continue
+        }
+        seen.add(key)
+        kept.push(r)
+      }
+      t.rows = kept
+    }
+  }
+
+  if (!merge || cloned.length === 0) {
+    return { tables: cloned, dedupedRemoved }
+  }
+
+  const unifiedHeaders = ["_source_file"]
+  for (const t of cloned) {
+    for (const h of t.headers) {
+      if (!unifiedHeaders.includes(h)) unifiedHeaders.push(h)
+    }
+  }
+  const mergedRows = []
+  const seenMerged = new Set()
+  for (const t of cloned) {
+    const idxMap = new Map(t.headers.map((h, idx) => [h, idx]))
+    for (const r of t.rows) {
+      const aligned = [t.sourceFile || t.name]
+      for (let c = 1; c < unifiedHeaders.length; c++) {
+        const idx = idxMap.get(unifiedHeaders[c])
+        aligned.push(idx !== undefined && idx < r.length ? r[idx] : "")
+      }
+      if (dedupe) {
+        const key = aligned.slice(1).map((v) => cleanCellStr(v)).join("\u001f")
+        if (seenMerged.has(key)) continue
+        seenMerged.add(key)
+      }
+      mergedRows.push(aligned)
+    }
+  }
+  return {
+    tables: [
+      { name: "Merged_Summary", headers: unifiedHeaders, rows: mergedRows, sourceFile: "merged" },
+      ...cloned,
+    ],
+    dedupedRemoved,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Minimal Pure-JS CRC32 + Store ZIP Builder (Zero Dependencies, Valid OpenXML!)
+// ---------------------------------------------------------------------------
+
+const CRC_TABLE = (() => {
+  const tbl = new Uint32Array(256)
+  for (let i = 0; i < 256; i++) {
+    let c = i
+    for (let k = 0; k < 8; k++) {
+      c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+    }
+    tbl[i] = c >>> 0
+  }
+  return tbl
+})()
+
+function crc32(bytes) {
+  let crc = 0xffffffff
+  for (let i = 0; i < bytes.length; i++) {
+    crc = CRC_TABLE[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8)
+  }
+  return (crc ^ 0xffffffff) >>> 0
+}
+
+function buildZipArchive(entries) {
+  const enc = new TextEncoder()
+  const localParts = []
+  const centralParts = []
+  let offset = 0
+
+  for (const entry of entries) {
+    const nameBytes = enc.encode(entry.name)
+    const dataBytes =
+      entry.data instanceof Uint8Array ? entry.data : enc.encode(String(entry.data))
+    const crc = crc32(dataBytes)
+    const size = dataBytes.length
+
+    const localHeader = new Uint8Array(30 + nameBytes.length)
+    const lv = new DataView(localHeader.buffer)
+    lv.setUint32(0, 0x04034b50, true)
+    lv.setUint16(4, 20, true)
+    lv.setUint16(6, 0x0800, true) // UTF-8 filename flag
+    lv.setUint16(8, 0, true) // store (0 = uncompressed, universally accepted by Excel & Word)
+    lv.setUint16(10, 0, true)
+    lv.setUint16(12, 0x5721, true)
+    lv.setUint32(14, crc, true)
+    lv.setUint32(18, size, true)
+    lv.setUint32(22, size, true)
+    lv.setUint16(26, nameBytes.length, true)
+    lv.setUint16(28, 0, true)
+    localHeader.set(nameBytes, 30)
+
+    localParts.push(localHeader, dataBytes)
+
+    const centralHeader = new Uint8Array(46 + nameBytes.length)
+    const cv = new DataView(centralHeader.buffer)
+    cv.setUint32(0, 0x02014b50, true)
+    cv.setUint16(4, 20, true)
+    cv.setUint16(6, 20, true)
+    cv.setUint16(8, 0x0800, true)
+    cv.setUint16(10, 0, true)
+    cv.setUint16(12, 0, true)
+    cv.setUint16(14, 0x5721, true)
+    cv.setUint32(16, crc, true)
+    cv.setUint32(20, size, true)
+    cv.setUint32(24, size, true)
+    cv.setUint16(28, nameBytes.length, true)
+    cv.setUint16(30, 0, true)
+    cv.setUint16(32, 0, true)
+    cv.setUint16(34, 0, true)
+    cv.setUint16(36, 0, true)
+    cv.setUint32(38, 0, true)
+    cv.setUint32(42, offset, true)
+    centralHeader.set(nameBytes, 46)
+    centralParts.push(centralHeader)
+
+    offset += localHeader.length + dataBytes.length
+  }
+
+  const centralSize = centralParts.reduce((s, p) => s + p.length, 0)
+  const eocd = new Uint8Array(22)
+  const ev = new DataView(eocd.buffer)
+  ev.setUint32(0, 0x06054b50, true)
+  ev.setUint16(4, 0, true)
+  ev.setUint16(6, 0, true)
+  ev.setUint16(8, entries.length, true)
+  ev.setUint16(10, entries.length, true)
+  ev.setUint32(12, centralSize, true)
+  ev.setUint32(16, offset, true)
+  ev.setUint16(20, 0, true)
+
+  const totalLen = offset + centralSize + 22
+  const out = new Uint8Array(totalLen)
+  let pos = 0
+  for (const p of localParts) {
+    out.set(p, pos)
+    pos += p.length
+  }
+  for (const p of centralParts) {
+    out.set(p, pos)
+    pos += p.length
+  }
+  out.set(eocd, pos)
+  return out
+}
+
+function xmlEscape(str) {
+  return sanitizeTextInput(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;")
+}
+
+function colLetter(colIdx1) {
+  let n = colIdx1
+  let s = ""
+  while (n > 0) {
+    const rem = (n - 1) % 26
+    s = String.fromCharCode(65 + rem) + s
+    n = Math.floor((n - 1) / 26)
+  }
+  return s
+}
+
+function displayWidth(str) {
+  const s = String(str ?? "")
+  let w = 0
+  for (let i = 0; i < s.length; i++) {
+    const cp = s.charCodeAt(i)
+    w += cp > 0x2e80 ? 2.1 : 1.0
+  }
+  return w
+}
+
+function buildXlsxBytes(tables, { injectFormulas = true } = {}) {
+  const effective =
+    tables.length > 0
+      ? tables
+      : [{ name: "Sheet1", headers: ["Column_1"], rows: [[""]] }]
+
+  const usedNames = new Set()
+  const safeSheetName = (raw, idx) => {
+    const cleaned = (cleanCellStr(raw).replace(/[\[\]:*?/\\]/g, "_") || `Sheet${idx}`).slice(0, 28)
+    let cand = cleaned
+    let n = 2
+    while (usedNames.has(cand.toLowerCase())) {
+      const suf = `_${n++}`
+      cand = `${cleaned.slice(0, 31 - suf.length)}${suf}`
+    }
+    usedNames.add(cand.toLowerCase())
+    return cand
+  }
+
+  // Style indices in styles.xml:
+  // 0: default, 1: body text, 2: integer (#,##0), 3: decimal (#,##0.00),
+  // 4: currency ("¥"#,##0.00), 5: percent (0.00%), 6: navy header, 7: total label, 8: total num/curr, 9: total pct
+  const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="2">
+    <numFmt numFmtId="164" formatCode="&quot;¥&quot;#,##0.00;[Red]-&quot;¥&quot;#,##0.00"/>
+    <numFmt numFmtId="165" formatCode="#,##0.00"/>
+  </numFmts>
+  <fonts count="3">
+    <font><sz val="10"/><color rgb="FF111827"/><name val="Microsoft YaHei"/></font>
+    <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Microsoft YaHei"/></font>
+    <font><b/><sz val="10"/><color rgb="FF0F172A"/><name val="Microsoft YaHei"/></font>
+  </fonts>
+  <fills count="4">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF1E3A5F"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFE2E8F0"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border>
+      <left style="thin"><color rgb="FFCBD5E1"/></left>
+      <right style="thin"><color rgb="FFCBD5E1"/></right>
+      <top style="thin"><color rgb="FFCBD5E1"/></top>
+      <bottom style="thin"><color rgb="FFCBD5E1"/></bottom>
+      <diagonal/>
+    </border>
+  </borders>
+  <cellStyleXfs count="1">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
+  </cellStyleXfs>
+  <cellXfs count="10">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/>
+    <xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+    <xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+    <xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+    <xf numFmtId="10" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
+    <xf numFmtId="165" fontId="2" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+    <xf numFmtId="10" fontId="2" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1"/>
+  </cellXfs>
+  <cellStyles count="1">
+    <cellStyle name="Normal" xfId="0" builtinId="0"/>
+  </cellStyles>
+</styleSheet>`
+
+  const sheetFiles = []
+  const sheetNames = []
+
+  effective.forEach((tbl, idx) => {
+    const sName = safeSheetName(tbl.name, idx + 1)
+    sheetNames.push(sName)
+    const ncols = Math.max(1, tbl.headers.length)
+    const nrows = tbl.rows.length
+    const widths = tbl.headers.map((h) => Math.max(10, displayWidth(h) + 4))
+    const colNumCounts = new Array(ncols).fill(0)
+    const colNonEmpty = new Array(ncols).fill(0)
+    const colPctCounts = new Array(ncols).fill(0)
+
+    const rowXmlList = []
+    // Row 1: Header
+    const hdrCells = tbl.headers.map((h, c0) => {
+      const ref = `${colLetter(c0 + 1)}1`
+      return `<c r="${ref}" t="inlineStr" s="6"><is><t xml:space="preserve">${xmlEscape(cleanCellStr(h))}</t></is></c>`
+    })
+    rowXmlList.push(`<row r="1" ht="25" customHeight="1">${hdrCells.join("")}</row>`)
+
+    // Data rows
+    tbl.rows.forEach((r, r0) => {
+      const rNum = r0 + 2
+      const cells = []
+      for (let c0 = 0; c0 < ncols; c0++) {
+        const rawVal = r[c0] ?? ""
+        const typed = parseTypedCell(rawVal)
+        const ref = `${colLetter(c0 + 1)}${rNum}`
+        widths[c0] = Math.max(widths[c0], Math.min(56, displayWidth(rawVal) + 3.5))
+        if (typed.value !== "") colNonEmpty[c0]++
+        if (typeof typed.value === "number") {
+          colNumCounts[c0]++
+          if (typed.kind === "percent") colPctCounts[c0]++
+          cells.push(`<c r="${ref}" s="${typed.styleIdx}"><v>${typed.value}</v></c>`)
+        } else {
+          cells.push(
+            `<c r="${ref}" t="inlineStr" s="1"><is><t xml:space="preserve">${xmlEscape(typed.value)}</t></is></c>`,
+          )
+        }
+      }
+      rowXmlList.push(`<row r="${rNum}" ht="20" customHeight="1">${cells.join("")}</row>`)
+    })
+
+    // Live SUM & AVERAGE formulas
+    const numericCols = []
+    for (let c0 = 0; c0 < ncols; c0++) {
+      if (
+        colNumCounts[c0] >= 2 &&
+        colNumCounts[c0] >= 0.5 * Math.max(1, colNonEmpty[c0]) &&
+        !ID_HEADER_RE.test(tbl.headers[c0])
+      ) {
+        numericCols.push(c0)
+      }
+    }
+
+    if (injectFormulas && nrows >= 2 && numericCols.length > 0) {
+      for (const [offset, label, fnName] of [
+        [2, "合计 (SUM)", "SUM"],
+        [3, "均值 (AVG)", "AVERAGE"],
+      ]) {
+        const rNum = nrows + offset
+        const fCells = []
+        for (let c0 = 0; c0 < ncols; c0++) {
+          const ref = `${colLetter(c0 + 1)}${rNum}`
+          if (c0 === 0 && !numericCols.includes(0)) {
+            fCells.push(`<c r="${ref}" t="inlineStr" s="7"><is><t>${xmlEscape(label)}</t></is></c>`)
+          } else if (numericCols.includes(c0)) {
+            const isPct = colPctCounts[c0] > colNumCounts[c0] / 2
+            if (fnName === "SUM" && isPct) {
+              fCells.push(`<c r="${ref}" t="inlineStr" s="7"><is><t>-</t></is></c>`)
+            } else {
+              const colL = colLetter(c0 + 1)
+              const sIdx = isPct ? 9 : 8
+              fCells.push(
+                `<c r="${ref}" s="${sIdx}"><f>${fnName}(${colL}2:${colL}${nrows + 1})</f></c>`,
+              )
+            }
+          } else {
+            fCells.push(`<c r="${ref}" t="inlineStr" s="7"><is><t></t></is></c>`)
+          }
+        }
+        rowXmlList.push(`<row r="${rNum}" ht="22" customHeight="1">${fCells.join("")}</row>`)
+      }
+    }
+
+    const colsXml = widths
+      .map(
+        (w, c0) =>
+          `<col min="${c0 + 1}" max="${c0 + 1}" width="${w.toFixed(1)}" customWidth="1"/>`,
+      )
+      .join("")
+    const lastDataRow = Math.max(1, nrows + 1)
+    const filterRef = `A1:${colLetter(ncols)}${lastDataRow}`
+
+    const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews>
+    <sheetView workbookViewId="0">
+      <pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>
+    </sheetView>
+  </sheetViews>
+  <cols>${colsXml}</cols>
+  <sheetData>${rowXmlList.join("")}</sheetData>
+  <autoFilter ref="${filterRef}"/>
+</worksheet>`
+
+    sheetFiles.push({ name: `xl/worksheets/sheet${idx + 1}.xml`, data: sheetXml })
+  })
+
+  const wbSheetsXml = sheetNames
+    .map(
+      (n, idx) =>
+        `<sheet name="${xmlEscape(n)}" sheetId="${idx + 1}" r:id="rId${idx + 1}"/>`,
+    )
+    .join("")
+
+  const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>${wbSheetsXml}</sheets>
+</workbook>`
+
+  const wbRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  ${sheetNames
+    .map(
+      (_, idx) =>
+        `<Relationship Id="rId${idx + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${idx + 1}.xml"/>`,
+    )
+    .join("")}
+  <Relationship Id="rId${sheetNames.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`
+
+  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  ${sheetNames
+    .map(
+      (_, idx) =>
+        `<Override PartName="/xl/worksheets/sheet${idx + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
+    )
+    .join("")}
+</Types>`
+
+  const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`
+
+  return buildZipArchive([
+    { name: "[Content_Types].xml", data: contentTypesXml },
+    { name: "_rels/.rels", data: rootRelsXml },
+    { name: "xl/workbook.xml", data: workbookXml },
+    { name: "xl/_rels/workbook.xml.rels", data: wbRelsXml },
+    { name: "xl/styles.xml", data: stylesXml },
+    ...sheetFiles,
+  ])
+}
+
+function buildDocxBytes({ title = "DocuClean Report", tables = [], paragraphs = [] }) {
+  const wRun = (txt, { bold = false, color = "111827", szHalfPt = 21 } = {}) => `
+    <w:r>
+      <w:rPr>
+        <w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Microsoft YaHei"/>
+        ${bold ? "<w:b/>" : ""}
+        <w:color w:val="${color}"/>
+        <w:sz w:val="${szHalfPt}"/>
+      </w:rPr>
+      <w:t xml:space="preserve">${xmlEscape(txt)}</w:t>
+    </w:r>`
+
+  const bodyParts = [
+    `<w:p><w:pPr><w:spacing w:after="160"/></w:pPr>${wRun(title, {
+      bold: true,
+      color: "1E3A5F",
+      szHalfPt: 32,
+    })}</w:p>`,
+  ]
+
+  for (const p of paragraphs) {
+    bodyParts.push(
+      `<w:p><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr>${wRun(p)}</w:p>`,
+    )
+  }
+
+  for (const tbl of tables) {
+    bodyParts.push(
+      `<w:p><w:pPr><w:spacing w:before="140" w:after="80"/></w:pPr>${wRun(tbl.name, {
+        bold: true,
+        color: "1E3A5F",
+        szHalfPt: 24,
+      })}</w:p>`,
+    )
+
+    const hdrCells = tbl.headers
+      .map(
+        (h) => `
+      <w:tc>
+        <w:tcPr><w:shd w:val="clear" w:color="auto" w:fill="1E3A5F"/></w:tcPr>
+        <w:p><w:pPr><w:jc w:val="center"/></w:pPr>${wRun(h, {
+          bold: true,
+          color: "FFFFFF",
+          szHalfPt: 19,
+        })}</w:p>
+      </w:tc>`,
+      )
+      .join("")
+
+    const dataRows = tbl.rows
+      .map((r, rIdx) => {
+        const fill = rIdx % 2 === 1 ? `<w:shd w:val="clear" w:color="auto" w:fill="F8FAFC"/>` : ""
+        const tcs = tbl.headers
+          .map((_, c0) => {
+            const raw = r[c0] ?? ""
+            const typed = parseTypedCell(raw)
+            const align = typeof typed.value === "number" ? "right" : "left"
+            return `<w:tc><w:tcPr>${fill}</w:tcPr><w:p><w:pPr><w:jc w:val="${align}"/></w:pPr>${wRun(
+              cleanCellStr(raw),
+              { szHalfPt: 19 },
+            )}</w:p></w:tc>`
+          })
+          .join("")
+        return `<w:tr><w:trPr><w:cantSplit/></w:trPr>${tcs}</w:tr>`
+      })
+      .join("")
+
+    bodyParts.push(`
+      <w:tbl>
+        <w:tblPr>
+          <w:tblW w:w="5000" w:type="pct"/>
+          <w:tblBorders>
+            <w:top w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+            <w:left w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+            <w:bottom w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+            <w:right w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+            <w:insideH w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+            <w:insideV w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>
+          </w:tblBorders>
+        </w:tblPr>
+        <w:tr><w:trPr><w:tblHeader/><w:cantSplit/></w:trPr>${hdrCells}</w:tr>
+        ${dataRows}
+      </w:tbl>
+      <w:p/>`)
+  }
+
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    ${bodyParts.join("\n")}
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1152" w:right="1152" w:bottom="1152" w:left="1152"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`
+
+  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`
+
+  const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`
+
+  return buildZipArchive([
+    { name: "[Content_Types].xml", data: contentTypesXml },
+    { name: "_rels/.rels", data: rootRelsXml },
+    { name: "word/document.xml", data: documentXml },
+  ])
+}
+
+function buildMarkdownText({ title = "DocuClean Report", tables = [], paragraphs = [] }) {
+  const esc = (s) => cleanCellStr(s).replace(/\|/g, "\\|").replace(/\n/g, " ")
+  const out = [`# ${title}`, ""]
+  for (const p of paragraphs) out.push(p, "")
+  for (const t of tables) {
+    out.push(`## ${t.name}`, "")
+    out.push(`| ${t.headers.map(esc).join(" | ")} |`)
+    out.push(`| ${t.headers.map(() => "---").join(" | ")} |`)
+    for (const r of t.rows) {
+      out.push(`| ${t.headers.map((_, i) => esc(r[i] ?? "")).join(" | ")} |`)
+    }
+    out.push("")
+  }
+  return `${out.join("\n").trim()}\n`
+}
+
+function sanitizeCsvCell(val) {
+  const s = cleanCellStr(val)
+  if (!s) return ""
+  const typed = parseTypedCell(s)
+  if (typeof typed.value === "number") return s
+  if (s[0] === "=" || s[0] === "+" || s[0] === "-" || s[0] === "@") {
+    return `'${s}`
+  }
+  return s
+}
+
+function buildUtf8BomCsv(table) {
+  if (!table) return "\ufeff"
+  const quote = (v) => {
+    const s = sanitizeCsvCell(v)
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+  }
+  const lines = [
+    table.headers.map(quote).join(","),
+    ...table.rows.map((r) => table.headers.map((_, i) => quote(r[i] ?? "")).join(",")),
+  ]
+  return `\ufeff${lines.join("\r\n")}\r\n`
+}
+
+
+const PRESETS = {
+  mojibake: {
+    filename: "mojibake_sales.csv",
+    text: "åæ®ç¼å·,å¤§åº,é¨é¨,äº¤ææ¥æ,è®¢åéé¢,éæ¬¾è°æ´,æ¯å©ç\n001081,åä¸åº,ä¼ä¸æå¡é¨,2026å¹´11æ01æ¥,\"Â¥12,500.00\",(Â¥320.00),38.5%\n001082,åååº,æ¸ éæå±é¨,2026/11/05,\"Â¥8,900.50\",Â¥0.00,41.2%\n001083,åååº,æ¿ä¼äº¤ä»é¨,2026.11.12,\"Â¥25,400.00\",(Â¥1,100.00),35.0%\n001084,è¥¿ååº,æ°åªä½è¿è¥,2026-11-18,\"Â¥6,380.00\",Â¥0.00,44.8%\n001084,è¥¿ååº,æ°åªä½è¿è¥,2026-11-18,\"Â¥6,380.00\",Â¥0.00,44.8%"
+  },
+  html: {
+    filename: "regional_rebate.html",
+    text: `<table>
+  <caption>区域渠道季度回款统计</caption>
+  <tr><th>所属大区</th><th>城市站点</th><th colspan="2">回款与成本明细</th><th>回款完成率</th></tr>
+  <tr><td rowspan="2">华东区</td><td>上海站</td><td>¥185,000.00</td><td>¥112,000.00</td><td>96.5%</td></tr>
+  <tr><td>苏州站</td><td>¥94,500.00</td><td>¥58,200.00</td><td>94.0%</td></tr>
+  <tr><td>华南区</td><td>深圳站</td><td>¥210,000.00</td><td>¥126,400.00</td><td>98.2%</td></tr>
+</table>`
+  },
+  json: {
+    filename: "nested_orders.json",
+    text: JSON.stringify({
+      orders: [
+        { order_id: "SO-8801", customer: { company: "星海智造科技", city: "杭州" }, qty: 15, amount: "¥4,250.00", margin: "32.0%" },
+        { order_id: "SO-8802", customer: { company: "远景自动化设备", city: "苏州" }, qty: 28, amount: "¥7,980.00", margin: "36.5%" },
+        { order_id: "SO-8803", customer: { company: "深蓝精密电子", city: "深圳" }, qty: 12, amount: "¥3,360.00", margin: "29.8%" }
+      ]
+    }, null, 2)
+  },
+  md: {
+    filename: "broken_pdf_notes.md",
+    text: `# 2026年度供应链成本复盘纪要
+
+本纪要由扫描导出的断行文本自动重组生成，原本被硬回车切碎的句子
+在经过段落流式重排算法处理后会自动拼接为完整通顺的自然段，可直接导出为标准微软雅黑排版的 Word 文档。
+
+| 费用科目 | 第一季度 | 第二季度 | 同比变动 |
+| --- | --- | --- | --- |
+| 干线物流费 | ¥128,000.00 | ¥114,500.00 | -10.5% |
+| 云仓操作费 | ¥64,200.00 | ¥61,800.00 | -3.7% |
+| 包装耗材费 | ¥23,500.00 | ¥22,100.00 | -6.0% |`
+  }
+};
+
+let currentPayloads = [];
+let currentResult = { tables: [], paragraphs: [], title: "DocuClean_Export", encodingLabel: "utf-8" };
+let activeTabIdx = 0;
+
+const rawInput = document.getElementById("rawInput");
+const fileInput = document.getElementById("fileInput");
+const dropzone = document.getElementById("dropzone");
+
+function triggerDownload(filename, content, mime) {
+  const blob = content instanceof Uint8Array
+    ? new Blob([content], { type: mime })
+    : new Blob([content], { type: mime + ";charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function runConversion() {
+  const t0 = performance.now();
+  const merge = document.getElementById("optMerge").checked;
+  const dedupe = document.getElementById("optDedupe").checked;
+  const payloads = currentPayloads.length > 0
+    ? currentPayloads
+    : [{ filename: "pasted_input.txt", text: rawInput.value }];
+
+  const parsedDocs = payloads.map((p) => parseInputPayload(p));
+  const rawTables = parsedDocs.flatMap((d) => d.tables);
+  const paragraphs = parsedDocs.flatMap((d) => d.paragraphs);
+  const { tables, dedupedRemoved } = mergeAndDedupeTables(rawTables, {
+    merge: merge && rawTables.length > 1,
+    dedupe,
+  });
+
+  const elapsed = (performance.now() - t0).toFixed(1);
+  const encSet = [...new Set(parsedDocs.map((d) => d.encoding))].join(", ");
+  const anyMoji = parsedDocs.some((d) => d.mojibakeRepaired);
+
+  currentResult = {
+    title: parsedDocs[0]?.title || "DocuClean_Export",
+    tables,
+    paragraphs,
+    encodingLabel: encSet || "utf-8",
+  };
+  if (activeTabIdx >= tables.length) activeTabIdx = 0;
+
+  document.getElementById("elapsedBadge").textContent = elapsed + " ms";
+  document.getElementById("encodingBadge").textContent = anyMoji ? "已自动修复乱码" : (encSet || "UTF-8");
+  document.getElementById("statTables").textContent = String(tables.length);
+  document.getElementById("statRows").textContent = String(tables.reduce((s, t) => s + t.rows.length, 0));
+  document.getElementById("statDedupe").textContent = String(dedupedRemoved);
+  document.getElementById("statEncoding").textContent = anyMoji ? "乱码已修复" : (encSet || "UTF-8");
+
+  renderTabsAndTable();
+}
+
+function renderTabsAndTable() {
+  const tabsEl = document.getElementById("sheetTabs");
+  const tblEl = document.getElementById("previewTable");
+  const paraEl = document.getElementById("paraBox");
+  const injectFormulas = document.getElementById("optFormulas").checked;
+
+  tabsEl.innerHTML = "";
+  currentResult.tables.forEach((t, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tab-btn" + (idx === activeTabIdx ? " active" : "");
+    b.textContent = t.name + " (" + t.rows.length + ")";
+    b.onclick = () => { activeTabIdx = idx; renderTabsAndTable(); };
+    tabsEl.appendChild(b);
+  });
+
+  const active = currentResult.tables[activeTabIdx];
+  if (!active) {
+    tblEl.innerHTML = "<tr><td style='padding:18px;color:#64748b;'>暂无结构化表格（请查看下方重排段落或粘贴表格数据）</td></tr>";
+  } else {
+    const ncols = active.headers.length;
+    const colSums = new Array(ncols).fill(0);
+    const colCounts = new Array(ncols).fill(0);
+    const colPcts = new Array(ncols).fill(0);
+
+    let htmlStr = "<thead><tr>" + active.headers.map((h) => "<th>" + escapeHtml(h) + "</th>").join("") + "</tr></thead><tbody>";
+    for (const r of active.rows) {
+      htmlStr += "<tr>";
+      for (let c = 0; c < ncols; c++) {
+        const raw = r[c] ?? "";
+        const typed = parseTypedCell(raw);
+        if (typeof typed.value === "number" && !ID_HEADER_RE.test(active.headers[c])) {
+          colSums[c] += typed.value;
+          colCounts[c]++;
+          if (typed.kind === "percent") colPcts[c]++;
+          htmlStr += "<td class='num'>" + escapeHtml(cleanCellStr(raw)) + "</td>";
+        } else {
+          htmlStr += "<td>" + escapeHtml(String(typed.value)) + "</td>";
+        }
+      }
+      htmlStr += "</tr>";
+    }
+
+    if (injectFormulas && active.rows.length >= 2 && colCounts.some((n) => n >= 2)) {
+      htmlStr += "<tr class='formula-row'>";
+      for (let c = 0; c < ncols; c++) {
+        if (c === 0 && colCounts[0] < 2) htmlStr += "<td>合计 (SUM 公式预览)</td>";
+        else if (colCounts[c] >= 2) {
+          const isPct = colPcts[c] > colCounts[c] / 2;
+          htmlStr += "<td class='num'>" + (isPct ? "-" : colSums[c].toLocaleString("zh-CN", { maximumFractionDigits: 2 })) + "</td>";
+        } else htmlStr += "<td></td>";
+      }
+      htmlStr += "</tr><tr class='formula-row'>";
+      for (let c = 0; c < ncols; c++) {
+        if (c === 0 && colCounts[0] < 2) htmlStr += "<td>均值 (AVERAGE 公式预览)</td>";
+        else if (colCounts[c] >= 2) {
+          const isPct = colPcts[c] > colCounts[c] / 2;
+          const avg = colSums[c] / colCounts[c];
+          htmlStr += "<td class='num'>" + (isPct ? (avg * 100).toFixed(2) + "%" : avg.toLocaleString("zh-CN", { maximumFractionDigits: 2 })) + "</td>";
+        } else htmlStr += "<td></td>";
+      }
+      htmlStr += "</tr>";
+    }
+    htmlStr += "</tbody>";
+    tblEl.innerHTML = htmlStr;
+  }
+
+  if (currentResult.paragraphs.length > 0) {
+    paraEl.style.display = "block";
+    paraEl.innerHTML = "<div style='font-weight:700;margin-bottom:6px;color:#38bdf8;'>已重排文档自然段（将随表格一并写入 Word / Markdown）：</div>" +
+      currentResult.paragraphs.map((p) => "<div style='margin-bottom:6px;'>" + escapeHtml(p) + "</div>").join("");
+  } else {
+    paraEl.style.display = "none";
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+document.querySelectorAll("[data-preset]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const p = PRESETS[btn.dataset.preset];
+    currentPayloads = [{ filename: p.filename, text: p.text }];
+    rawInput.value = p.text;
+    activeTabIdx = 0;
+    runConversion();
+  });
+});
+
+rawInput.addEventListener("input", () => {
+  currentPayloads = [];
+});
+
+document.getElementById("runBtn").addEventListener("click", runConversion);
+document.getElementById("clearBtn").addEventListener("click", () => {
+  currentPayloads = [];
+  rawInput.value = "";
+  runConversion();
+});
+["optMerge", "optDedupe", "optFormulas"].forEach((id) => {
+  document.getElementById(id).addEventListener("change", runConversion);
+});
+
+dropzone.addEventListener("click", () => fileInput.click());
+dropzone.addEventListener("dragover", (e) => { e.preventDefault(); dropzone.classList.add("dragover"); });
+dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+dropzone.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  dropzone.classList.remove("dragover");
+  await loadFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener("change", async () => {
+  if (fileInput.files.length) await loadFiles(fileInput.files);
+});
+
+async function loadFiles(fileList) {
+  const items = [];
+  for (const f of fileList) {
+    const buf = new Uint8Array(await f.arrayBuffer());
+    items.push({ filename: f.name, bytes: buf });
+  }
+  currentPayloads = items;
+  const firstDec = decodeBytesSmart(items[0].bytes);
+  rawInput.value = firstDec.text.slice(0, 4000);
+  activeTabIdx = 0;
+  runConversion();
+}
+
+document.getElementById("dlXlsxBtn").addEventListener("click", () => {
+  const injectFormulas = document.getElementById("optFormulas").checked;
+  const bytes = buildXlsxBytes(currentResult.tables, { injectFormulas });
+  triggerDownload(currentResult.title + "_clean.xlsx", bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+});
+document.getElementById("dlDocxBtn").addEventListener("click", () => {
+  const bytes = buildDocxBytes(currentResult);
+  triggerDownload(currentResult.title + "_clean.docx", bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+});
+document.getElementById("dlCsvBtn").addEventListener("click", () => {
+  const csv = buildUtf8BomCsv(currentResult.tables[activeTabIdx] || currentResult.tables[0]);
+  triggerDownload(currentResult.title + "_utf8.csv", csv, "text/csv");
+});
+document.getElementById("dlMdBtn").addEventListener("click", () => {
+  const md = buildMarkdownText(currentResult);
+  triggerDownload(currentResult.title + "_clean.md", md, "text/markdown");
+});
+
+// Boot with Preset 1 (real Mojibake CSV repair + deduplication + live formulas)
+currentPayloads = [{ filename: PRESETS.mojibake.filename, text: PRESETS.mojibake.text }];
+rawInput.value = PRESETS.mojibake.text;
+runConversion();
+  </script>
+</body>
+</html>

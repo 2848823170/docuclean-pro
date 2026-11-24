@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' file: 'unsafe-inline'; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data: blob:; frame-src 'self' file: blob: data:; connect-src 'none'; form-action 'none';" />
+  <title>DocuClean Pro (文档表格秒转引擎) — Zero-Cloud PDF/HTML/CSV Mojibake to Styled .xlsx &amp; .docx Converter</title>
+  <meta name="description" content="100% offline local-first converter for messy PDF tables, HTML rowspan/colspan tables, JSON/XML dumps, and GBK/GB18030 mojibake CSVs -> formula-ready .xlsx & clean .docx." />
+  <style>
+    :root {
+      --bg: #07131d;
+      --bg-card: #0e1e2e;
+      --bg-elevated: #162b40;
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --brand: #10b981;
+      --brand-hover: #059669;
+      --accent: #38bdf8;
+      --amber: #fbbf24;
+      --border: rgba(148, 163, 184, 0.2);
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(16, 185, 129, 0.16), transparent 42%),
+        radial-gradient(circle at 84% 8%, rgba(56, 189, 248, 0.14), transparent 40%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(12px);
+      background: rgba(7, 19, 29, 0.88);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; gap: 14px; flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+    .brand-mark {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: linear-gradient(135deg, #10b981, #38bdf8);
+      color: #03151e; display: grid; place-items: center; font-weight: 900; font-size: 16px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 800;
+      border: 1px solid var(--border); background: var(--bg-elevated); color: var(--ink);
+      cursor: pointer; transition: transform 0.12s ease, border-color 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: rgba(248, 250, 252, 0.4); }
+    .btn-primary {
+      background: linear-gradient(135deg, #ffe600, #f59e0b);
+      color: #0f172a; border-color: transparent;
+    }
+    .btn-green {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #03150e; border-color: transparent;
+    }
+    .hero { padding: 48px 0 28px; text-align: center; }
+    .pills { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .pill {
+      padding: 5px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+      background: rgba(16, 185, 129, 0.16); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.35);
+    }
+    h1 { font-size: clamp(28px, 4.4vw, 46px); line-height: 1.16; margin: 0 auto 14px; max-width: 920px; }
+    .sub { font-size: 17px; color: var(--ink-muted); max-width: 780px; margin: 0 auto 24px; }
+    .cta-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
+    .demo-frame-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45); margin-bottom: 44px;
+    }
+    .demo-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; background: #0a1724; border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 700; color: #cbd5e1; flex-wrap: wrap; gap: 8px;
+    }
+    iframe { width: 100%; height: 760px; border: 0; background: #ffffff; display: block; }
+    .grid3 {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px; margin-bottom: 44px;
+    }
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 22px;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 18px; color: #ffe600; }
+    .card p { margin: 0; color: var(--ink-muted); font-size: 14.5px; }
+    .pricing {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px; margin-bottom: 52px;
+    }
+    .p-card {
+      background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 16px;
+      padding: 26px; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .p-card.featured { border-color: #ffe600; box-shadow: 0 12px 36px rgba(255, 230, 0, 0.12); }
+    .price { font-size: 36px; font-weight: 900; color: #ffffff; margin: 8px 0 12px; }
+    .price small { font-size: 15px; color: var(--ink-muted); font-weight: 600; }
+    ul.feat { padding-left: 18px; margin: 0 0 20px; color: #cbd5e1; font-size: 14.5px; }
+    ul.feat li { margin-bottom: 7px; }
+    footer {
+      border-top: 1px solid var(--border); padding: 26px 0 38px;
+      text-align: center; font-size: 13.5px; color: var(--ink-muted);
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <div class="brand">
+        <span class="brand-mark">DC</span>
+        <span>DocuClean Pro · 文档表格秒转引擎</span>
+      </div>
+      <div class="nav-links">
+        <a class="btn" href="./demo.html" target="_blank" rel="noopener">⚡ 全屏打开在线转换工作台 (Live Converter)</a>
+        <a class="btn btn-primary" href="https://www.goofish.com/item?id=1101539642643" target="_blank" rel="noopener">🛒 闲鱼极速代转 / 获取离线包 (¥4.9起)</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="pills">
+        <span class="pill">🔒 100% 本地浏览器脱机转换 · 0 字节上传服务器</span>
+        <span class="pill">📊 自动修复 GBK/GB18030 中文乱码 &amp; 28位长单号防 E+</span>
+        <span class="pill">📑 原生输出带样式与求和公式的 .xlsx + 整洁 .docx</span>
+      </div>
+      <h1>把混乱的 PDF 跨页表格、乱码 CSV、网页报表<br/>3 秒变成整洁带公式的 Excel (<code>.xlsx</code>) 与 Word (<code>.docx</code>)</h1>
+      <p class="sub">
+        Zero-cloud local document &amp; spreadsheet clean-up studio. Repair CJK mojibake (<code>GB18030</code> / <code>Big5</code> / double-encoded UTF-8), flatten <code>rowspan</code>/<code>colspan</code> HTML tables, preserve 16–28 digit IDs as exact text, and export auto-sized OpenXML <code>.xlsx</code> &amp; <code>.docx</code> files completely offline.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://www.goofish.com/item?id=1101539642643" target="_blank" rel="noopener">🔥 PDF转Word/Excel代做 &amp; 完整工具包 (¥4.90)</a>
+        <a class="btn btn-green" href="./demo.html" target="_blank" rel="noopener">🚀 立即免费在线试用 (Open Web Converter)</a>
+        <a class="btn" href="https://github.com/2848823170/docuclean-pro" target="_blank" rel="noopener">GitHub Repo</a>
+      </div>
+    </section>
+
+    <section class="demo-frame-card" id="live-converter">
+      <div class="demo-bar">
+        <span>👇 <strong>实时零云端转换沙盒 (Interactive Offline Sandbox)</strong> — 直接拖入您的 CSV / HTML / JSON / XML / Markdown 即可秒出 .xlsx 与 .docx</span>
+        <a href="./demo.html" target="_blank" rel="noopener">在新标签页全屏打开 ↗</a>
+      </div>
+      <iframe src="./demo.html" title="DocuClean Pro Interactive Offline Converter" loading="lazy"></iframe>
+    </section>
+
+    <section class="grid3">
+      <div class="card">
+        <h3>1. 自动治愈 CSV 中文乱码与科学计数法</h3>
+        <p>智能识别 GB18030 / GBK / Big5 / UTF-16 与双重编码乱码；16~28 位身份证号、订单号、运单号强制保留为精确文本，告别 Excel 打开变 <code>E+17</code>，内置防公式注入保护。</p>
+      </div>
+      <div class="card">
+        <h3>2. 复杂跨页 PDF / 合并单元格表格提取</h3>
+        <p>精准展开 HTML <code>rowspan</code> / <code>colspan</code> 二维网格、拼接跨页断裂表头、清洗带千分位与货币符号的金额列，直接生成冻结首行、自适应列宽、带 <code>SUM</code> 汇总行的原生 <code>.xlsx</code>。</p>
+      </div>
+      <div class="card">
+        <h3>3. 隐私零泄漏（CSP 物理级断网沙盒）</h3>
+        <p>内置严格 <code>connect-src 'none'</code> 安全策略，合同、工资表、毕业论文与业务明细全程在您本机内存计算，绝不上传任何第三方转换服务器。</p>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+      <div class="p-card featured">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#ffe600;">⚡ 急单人工精修 / 离线专业版</div>
+          <h3 style="margin:6px 0 0;font-size:22px;">PDF转Word排版 · 跨页表格转Excel · 公式代写</h3>
+          <div class="price">¥4.90 <small>起 / 单次秒处理（闲鱼担保）</small></div>
+          <ul class="feat">
+            <li>支持复杂跨页 PDF 表格提取为带公式 <code>.xlsx</code> 工作簿</li>
+            <li>支持合同/论文 PDF 转可编辑 <code>.docx</code> 还原标题与段落样式</li>
+            <li>支持百份 Excel 分表合并拆表、VLOOKUP/XLOOKUP 公式代写与乱码修复</li>
+            <li>先发转换预览截图核对，满意再交完整可编辑原件，完单即删严格保密</li>
+          </ul>
+        </div>
+        <a class="btn btn-primary" href="https://www.goofish.com/item?id=1101539642643" target="_blank" rel="noopener">立即前往闲鱼下单处理 (item=1101539642643) →</a>
+      </div>
+
+      <div class="p-card">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#38bdf8;">🤖 进阶开发与自动化工程</div>
+          <h3 style="margin:6px 0 0;font-size:22px;">AI 智能体 Skill / MCP 配置 &amp; Python 脚本定制</h3>
+          <div class="price">¥5.00 <small>诊断抵扣 / 按需定制</small></div>
+          <ul class="feat">
+            <li>Claude Code / Cursor / OpenClaw 专属 <code>SKILL.md</code> 与 MCP 插件联调</li>
+            <li>定制一键运行的 Python / Excel 批量数据处理工具（含干净源码与中文手册）</li>
+            <li>需要财务流水与电子凭证自动核销？查看姊妹产品 <a href="https://2848823170.github.io/ledgerclean-pro/" target="_blank" rel="noopener">LedgerClean Pro (账清)</a></li>
+          </ul>
+        </div>
+        <a class="btn btn-green" href="https://www.goofish.com/item?id=1102654549394" target="_blank" rel="noopener">前往 AI / Python 定制专拍通道 →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      DocuClean Pro v1.0.0 · 100% Offline Zero-Cloud Document &amp; Spreadsheet Engine ·
+      <a href="https://2848823170.github.io/ledgerclean-pro/">LedgerClean Pro</a> ·
+      <a href="https://github.com/2848823170/ledgerclean-cli">ledgerclean-cli</a>
+    </div>
+  </footer>
+</body>
+</html>
